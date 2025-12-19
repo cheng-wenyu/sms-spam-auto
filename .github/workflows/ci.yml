@@ -41,7 +41,7 @@ jobs:
     # 6. (可选) 上传MLflow产物作为工作流附件
     - name: Archive MLflow artifacts
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: mlflow-run
         path: mlruns/ # MLflow默认的本地记录目录
