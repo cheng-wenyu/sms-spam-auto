@@ -1,0 +1,48 @@
+name: MLOps Training Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  run-training:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # 1. 获取代码
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    # 2. 设置Python环境
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    # 3. 安装依赖
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    # 4. 验证环境
+    - name: Verify imports
+      run: |
+        python -c "import sklearn; import mlflow; print('✅ 所有库就绪')"
+        
+    # 5. 运行你的训练脚本！🎯
+    - name: Execute ML Training
+      run: |
+        cd src
+        python train.py --experiment-name "auto_run_${{ github.run_number }}"
+        
+    # 6. (可选) 上传MLflow产物作为工作流附件
+    - name: Archive MLflow artifacts
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: mlflow-run
+        path: mlruns/ # MLflow默认的本地记录目录
+        retention-days: 7
